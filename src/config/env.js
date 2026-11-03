@@ -14,4 +14,8 @@ export const env = {
     clientUrls: clientUrls.length > 0 ? clientUrls : ["http://localhost:3000"],
     mongoUri: process.env.MONGODB_URI,
     mongoDbName: process.env.MONGODB_DB || "booknook",
+    authBaseUrl: (process.env.BETTER_AUTH_URL || "http://localhost:3000").replace(
+        /\/$/,
+        "",
+    ),
 };
