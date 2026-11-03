@@ -3,6 +3,14 @@ import { env } from "./env.js";
 
 let dbPromise;
 
+async function ensureIndexes(db) {
+    await db.collection("books").createIndexes([
+        { key: { createdAt: -1 } },
+        { key: { "addedBy.email": 1, createdAt: -1 } },
+    ]);
+}
+
+
 export function getDb() {
     if (!dbPromise) {
         if (!env.mongoUri) {
@@ -11,7 +19,17 @@ export function getDb() {
 
         dbPromise = new MongoClient(env.mongoUri)
             .connect()
-            .then((client) => client.db(env.mongoDbName))
+            .then(async (client) => {
+                const db = client.db(env.mongoDbName);
+
+                try {
+                    await ensureIndexes(db);
+                } catch (error) {
+                    console.error("Could not create indexes:", error.message);
+                }
+
+                return db;
+            })
             .catch((error) => {
                 dbPromise = undefined;
                 throw error;
@@ -20,6 +38,7 @@ export function getDb() {
 
     return dbPromise;
 }
+
 
 export async function getCollections() {
     const db = await getDb();

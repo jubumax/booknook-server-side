@@ -4,6 +4,7 @@ import { getDb } from "./config/db.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import { verifyToken } from "./middleware/verifyToken.js";
+import routes from "./routes/index.js";
 
 const app = express();
 
@@ -36,5 +37,6 @@ app.get("/me", verifyToken, (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
+app.use(routes);
 
 export default app;
