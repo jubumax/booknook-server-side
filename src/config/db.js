@@ -4,10 +4,15 @@ import { env } from "./env.js";
 let dbPromise;
 
 async function ensureIndexes(db) {
-    await db.collection("books").createIndexes([
-        { key: { createdAt: -1 } },
-        { key: { "addedBy.email": 1, createdAt: -1 } },
-    ]);
+  await db.collection("books").createIndexes([
+    { key: { createdAt: -1 } },
+    { key: { "addedBy.email": 1, createdAt: -1 } },
+  ]);
+
+  await db.collection("borrows").createIndexes([
+    { key: { bookId: 1, userEmail: 1 }, unique: true },
+    { key: { userEmail: 1, borrowDate: -1 } },
+  ]);
 }
 
 
