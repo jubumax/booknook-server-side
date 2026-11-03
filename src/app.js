@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
+import { getDb } from "./config/db.js";
 
 const app = express();
 
@@ -20,8 +21,11 @@ app.get("/", (req, res) => {
     res.json({ name: "BookNook API", status: "running" });
 });
 
-app.get("/health", (req, res) => {
-    res.json({ ok: true, uptime: process.uptime() });
+app.get("/health", async (req, res) => {
+    const db = await getDb();
+    await db.command({ ping: 1 });
+
+    res.json({ ok: true, database: "connected", uptime: process.uptime() });
 });
 
 
