@@ -1,10 +1,10 @@
 import cors from "cors";
 import express from "express";
-import { env } from "./config/env.js";
 import { getDb } from "./config/db.js";
+import { env } from "./config/env.js";
+import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 const app = express();
-
 
 app.use(
     cors({
@@ -28,5 +28,9 @@ app.get("/health", async (req, res) => {
     res.json({ ok: true, database: "connected", uptime: process.uptime() });
 });
 
+
+
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
