@@ -1,6 +1,7 @@
 import { getCollections } from "../config/db.js";
 import { authenticate } from "../middleware/verifyToken.js";
 import { ApiError } from "../utils/ApiError.js";
+import { parseBookInput } from "../utils/bookValidation.js";
 import { toObjectId } from "../utils/objectId.js";
 
 const MAX_BOOKS = 1000;
@@ -52,4 +53,28 @@ export async function getBook(req, res) {
     if (!book) throw ApiError.notFound("Book not found.");
 
     res.json(book);
+}
+
+
+
+export async function createBook(req, res) {
+    const data = parseBookInput(req.body);
+    const { books } = await getCollections();
+
+    const now = new Date();
+    const book = {
+        ...data,
+        availableCopies: data.totalCopies,
+        addedBy: {
+            id: req.user.id,
+            name: req.user.name || req.user.email.split("@")[0],
+            email: req.user.email,
+        },
+        createdAt: now,
+        updatedAt: now,
+    };
+
+    await books.insertOne(book);
+
+    res.status(201).json(book);
 }
