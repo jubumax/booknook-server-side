@@ -60,3 +60,45 @@ export async function borrowBook(req, res) {
 
     res.status(201).json(borrow);
 }
+
+
+export async function listMyBorrows(req, res) {
+    const { borrows } = await getCollections();
+
+    const result = await borrows
+        .find({ userEmail: req.user.email })
+        .sort({ borrowDate: -1, _id: -1 })
+        .toArray();
+
+    res.json(result);
+}
+
+
+export async function returnBorrowedBook(req, res) {
+    const { books, borrows } = await getCollections();
+    const borrowId = toObjectId(req.params.id, "Borrow");
+
+    const borrow = await borrows.findOne({ _id: borrowId });
+    if (!borrow) throw ApiError.notFound("Borrow record not found.");
+
+    if (borrow.userEmail !== req.user.email) {
+        throw ApiError.forbidden("You can only return books you borrowed.");
+    }
+
+
+    const removed = await borrows.findOneAndDelete({
+        _id: borrowId,
+        userEmail: req.user.email,
+    });
+    if (!removed) {
+        throw ApiError.notFound("This book has already been returned.");
+    }
+
+
+    await books.updateOne(
+        { _id: removed.bookId },
+        { $inc: { availableCopies: 1 } },
+    );
+
+    res.json({ message: "Book returned successfully." });
+}

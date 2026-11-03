@@ -3,8 +3,8 @@ import express from "express";
 import { getDb } from "./config/db.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
-import { verifyToken } from "./middleware/verifyToken.js";
 import routes from "./routes/index.js";
+// import { verifyToken } from "./middleware/verifyToken.js";
 
 const app = express();
 
@@ -31,9 +31,9 @@ app.get("/health", async (req, res) => {
 });
 
 
-app.get("/me", verifyToken, (req, res) => {
-    res.json(req.user);
-});
+// app.get("/me", verifyToken, (req, res) => {
+//     res.json(req.user);
+// });
 
 app.use(notFound);
 app.use(errorHandler);
