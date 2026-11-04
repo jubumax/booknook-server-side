@@ -4,7 +4,6 @@ import { getDb } from "./config/db.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import routes from "./routes/index.js";
-// import { verifyToken } from "./middleware/verifyToken.js";
 
 const app = express();
 
@@ -30,13 +29,9 @@ app.get("/health", async (req, res) => {
     res.json({ ok: true, database: "connected", uptime: process.uptime() });
 });
 
-
-// app.get("/me", verifyToken, (req, res) => {
-//     res.json(req.user);
-// });
+app.use(routes);
 
 app.use(notFound);
 app.use(errorHandler);
-app.use(routes);
 
 export default app;
